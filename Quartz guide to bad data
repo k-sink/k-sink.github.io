@@ -1,0 +1,77 @@
+https://github.com/Quartz/bad-data-guide
+
+Data can be full of problems and this guide contains solutions to those commonly encountered. Always document the changes that are made. 
+
+Issues that your source should solve
+-	Values are missing
+-	Zeros replace missing values 
+    o	Is it a null value or is it really the number 0
+-	Data are missing you know should be there
+-	Rows or values are duplicated
+-	Spelling is inconsistent
+-	Name order is inconsistent
+-	Data formats are inconsistent
+-	Units are not specified
+-	Categories are badly chosen
+-	Field names are ambiguous
+-	Provenance is not documented
+-	Suspicious values are present
+    o	65535: highest number represented by an unsigned 16-bit binary number (2^16th)
+    o	255: maximum value represented by an unsigned 8-bit byte (8 digit binary)
+    o	2147483647: maximum value for 32-bit binary signed integer (max integer)
+    o	4294967295: maximum value for 32-bit unsigned integer 
+    o	555-3485
+    o	9999 (any long sequence of 9’s)
+    o	0000 (any long sequence or other seuquence of 0’s)
+-	Data are too coarse
+    o	Do not take an annual value and divide it by 12 and call it average per month if you only have annual data because you don’t know the distribution of the values and the number will be meaningless
+-	Totals differ from published aggregates
+-	Spreadsheet has 65536 rows
+    o	Maximum rows in old excel, data may be truncated 
+    o	New version of excel allows 1,048,576 rows
+-	Spreadsheet has 255 columns
+-	Spreadsheet has dates in 1900, 1904, 1969, or 1970
+    o	Excel default date from which it counts all other dates is January 1, 1900
+-	Text has been converted to numbers 
+-	Numbers have been stored as text
+    o	Store numbers without formatting and include supporting information in column names or metadata (i.e. represent one million dollars as number 1000000 in a cell instead of 1,000,000 or 1 000 000 or USD 1,000,000 which are strings)
+
+Issues that you should solve
+-	Text is garbled
+    o	Encoding problems when text is represented by specific set of numbers and you don’t know what it is, find out from source what data are encoded in
+    o	Mojibake is garbled text that results when text is decoded using unintended character encoding which replaces symbols with unrelated ones or generic replacement character
+-	Line endings are garbled
+-	Data are in a PDF
+    o	Extract from a PDF with https://tabula.technology/
+-	Data are too granular
+-	Data were entered by humans
+-	Data are intermingled with formatting and annotations
+    o	Header rows
+-	Aggregations were computed on missing values
+-	Sample is not random
+-	Margin of error is too large
+    o	MOE is measure of range of possible true values
+    o	Be cautious of MOE >10%
+-	Margin of error is unknown
+-	Sample is biased
+-	Data have been manually edited
+-	Inflation skews the data
+-	Natural/seasonal variation skews the data
+    o	Important to know if the data has been seasonally adjusted
+-	Timeframe has been manipulated
+-	Frame of reference has been manipulated
+
+Issues that a third-party expert should help you solve
+-	Author is untrustworthy
+-	Collection process is opaque
+-	Data assert unrealistic precision
+-	There are inexplicable outliers
+-	An index masks underlying variation
+-	Results have been p-hacked
+-	Benford’s Law fails
+-	Too good to be true
+
+Issues a programmer should help you solve
+-	Data are aggregated to the wrong categories or geographies
+-	Data are in scanned documents
+
