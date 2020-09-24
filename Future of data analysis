@@ -1,0 +1,18 @@
+In 2016, Edward Tufte was the keynote speaker at the Microsoft Machine Learning and Data Science Summit. 
+He gave a talk entitled, "The Future of Data Analysis" during which he spoke about data analysis, critical thinking, and learning from the past. 
+Tufte incorporated Galileo who in his opinion, was one of the greatest data analysts and critical thinkers. He used a telescope to obtain vast quantities of information
+about astronomy and based his findings on visible evidence rather than pure speculation made from afar. Data analysis is about turning data into conclusions using evidence 
+and inference. 
+
+The analysis and presentation of the data is meant to assist reasoning and guide the viewer's cognitive understanding about the content they are exposed to. The fundamental
+and underlying task is to explain and make smart comparisions using the data, not the analysis. Tufte emphasized many quotes from analysts such as Tukey in addition to his own. 
+Succinct messages are more memorable than long and drawn out explanations. He stated how important it is to learn from others and their excellence. Try to understand
+what makes their work excellent and use the past to push the future. With the advancement of hardware and open source information and data, big data analysis is now possible. 
+However, just because we have access to vast quantities of information doesn't mean that every bit of it is meaningful or representative of the real world. Understand and 
+analyze the data in multiple ways. One display cannot accurately optimize the data. 
+
+A quote from John Tukey that says "data may not contain the answer and if you torture the data long enough, it will tell you anything," along with the "first principle
+is that you must not foll yourself and you are the easiest person to fool," quote from Feyman, are paramount points. The data should not be manipulated into telling any 
+desired story. The data has to be represented honestly and able to be replicated. Good practice is to pre-specify the models or tables that will be used to generate
+the findings from the data, not after the analysis. This forethought aids in over analysis of the data and the prevention of erroneous findings. 
+Data scientists must look beyond the data, into the real world, observe or understand the collection methods because people cannot keep their own score. 
