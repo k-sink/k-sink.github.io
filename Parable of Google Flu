@@ -1,0 +1,19 @@
+The article entitled “The Parable of Google Flu: Traps in Big Data Analysis” by Lazer, Kennedy, King, and Vespingnani was published in Science magazine, March 2014. 
+Google launched a web service in 2008 called Google Flu Trends (GFT), developed by Jeremy Ginsberg and Matthew Mohebbi, which was meant to use online search queries
+within the United States to identify and estimate influenza activity. 
+
+Ginsberg et al. (2009) explained that raw searches conducted in real time “accurately estimates influenza activity with a lag of about one day – one to two weeks 
+faster than the conventional reports published by the Centers for Disease Prevention and Control.” GFT was shown to be approximately 97% accurate for the 2009 
+flu pandemic when comparing data with the CDC (based on laboratory surveillance reports). However, GFT began to considerably overestimate flu incidence 
+between 2011 – 2013 and ultimately failed due to “big data hubris and algorithm dynamics (Lazer et al., 2014).” 
+
+Search data is filled with information about people and their current state of mind and focus. Real time queries can be quite valuable for predictions, 
+but it may not always be legitimate or reliable. During development, the model was trained with 45 search terms. The presence of too many parameters, 
+too much noise, caused the model to overfit. It was essentially incapable of generalizing new data and accurate analysis. 
+Google was not transparent about the search terms used or the original algorithm but it was indicated that GFT correlated the 
+search terms directly to external events rather than incorporating the aspect of recommended searches that appear based on user frequency. 
+Results differ between regions and societies. Big data should not be considered separate from “smaller data.” Instead, the information should be considered from “all.”
+
+
+Ginsberg, J., Mohebbi, M., Patel, R. et al. Detecting influenza epidemics using search engine query data. Nature 457, 1012–1014 (2009). https://doi.org/10.1038/nature07634
+
