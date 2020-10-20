@@ -1,0 +1,6 @@
+library(leaflet)
+m = leaflet(data = gauge) %>% 
+  addProviderTiles("OpenTopoMap") %>% 
+  addTiles(options = tileOptions(opacity = 0.25))#tiles are the images for viewer
+  addMarkers(lng = ~long, lat = ~lat, popup = ~gaugeID)
+m
