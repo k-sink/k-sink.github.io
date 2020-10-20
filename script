@@ -1,0 +1,131 @@
+# CAMELS Daymet data for common gauges (15 gauges)
+# Katharine Sink  10/7/2020
+#
+# DATA IMPORT AND ORGANIZATION
+#
+# load packages
+library(tidyverse)
+library(fs)
+library(lubridate)
+#
+# File path (location) for 15 text files
+setwd("C:/Users/katha/Documents/CAMELS/Daymet_flow_timeseries_common")
+getwd()
+filepath = getwd()
+#
+# create list of just the text files in the folder with the filepath
+allfiles = fs::dir_ls(filepath, regexp = "\\.txt$")
+allfiles
+#
+# Read in all the files into one table (dataframe)
+# read.table() uses any amount of whitespace delimiter, do NOT use read_table()
+# Use purrr::map() to map read_table onto list of files and 
+# map_dfr returns dataframe by row binding each element together
+# because each list element will be a tibble (dataframe)with same columns
+datatable = allfiles %>% map_dfr(read.table, .id = "source")
+#
+# delete duplicate header rows that were present for each file using subset()
+datatable = subset(datatable, V1!= "YR" & V2!= "MNTH" & V3!= "DY" & V4!= "HR" & 
+              V5!= "SWE" & V6!= "PRCP" & V7!= "RAIM" & V8!= "TAIR" & 
+              V9!= "PET" & V10!= "ET" & V11!= "MOD_RUN" & V12!= "OBS_RUN")
+#
+# rename columns using rename() function from dplyr 
+datatable = datatable %>% rename(GaugeID = source, YR = V1, MNTH = V2, DY = V3, HR = V4,
+                       SWE = V5, PRCP = V6, RAIM = V7, TAIR = V8, PET = V9,
+                       ET = V10, MOD_RUN = V11, OBS_RUN = V12)
+#
+# combine year, month, and day into one column (DATE) with a / separator
+datatable = unite(datatable, YR, MNTH, DY, col="DATE", sep= "/")
+#
+sapply(datatable, class) #list class type for all columns
+#
+# change columns from character to numeric class type  
+datatable = datatable %>% mutate(SWE = as.numeric(SWE), PRCP = as.numeric(PRCP), 
+                            RAIM = as.numeric(RAIM), TAIR = as.numeric(TAIR), 
+                            PET = as.numeric(PET), ET = as.numeric(ET), 
+                            MOD_RUN = as.numeric(MOD_RUN), OBS_RUN = as.numeric(OBS_RUN))
+#
+# take the date column and change from character into date type, creates 
+# a vector called datecolumn with same number of elements (observations) as
+# original column
+datecolumn = as.Date(datatable$DATE, format = "%Y/%m/%d")
+#
+# replace the DATE column with the vector datecolumn values,
+# column is now date not char
+datatable$DATE = datecolumn
+#
+# remove the HR column since all the values are 12
+datatable$HR = NULL
+#
+# edit the GaugeID, remove the filepath before and the extra filename after the gauge number
+datatable$GaugeID%<>%gsub("C:/Users/katha/Documents/CAMELS/Daymet_flow_timeseries_common/", "",.)%>% gsub("_05_model_output.txt", "", .)
+#
+# DATA VISUALIZATION
+#
+# adds month and year columns back for analysis (numeric date, not character)
+datatable = datatable %>%  mutate(MNTH = month(DATE)) %>%  mutate(YR = year(DATE))
+#
+# create new table (P month), grouped by gauge and month, precip total for each 
+# gauge per month (in column mnth_total), 15 gauges x 12 = 180 monthly totals
+# and month average (mnth_mean) precip 
+P_month = datatable %>% 
+  group_by(GaugeID,MNTH) %>% 
+  summarise(mnth_total = sum(PRCP), mnth_mean = mean(PRCP))
+
+# create a table for the annual totals, means for each gauge, 
+# 15 gauges, ~34 years each
+P_annual = datatable %>% 
+  group_by(GaugeID,YR) %>% 
+  summarise(yr_total = sum(PRCP), yr_mean = mean(PRCP))
+#
+# create table for precipitation for all gauges, months, years
+Precip = datatable %>% 
+     group_by(GaugeID, YR, MNTH) %>% 
+  select(PRCP) 
+
+# total each month, for each year, for each gauge, arrange by year then month
+prcp2 = Precip %>% 
+  summarise(total_mnth = sum(PRCP)) %>% 
+  arrange(YR, MNTH)
+
+# create columm histogram of overally monthly totals for all gauges
+#(geom_histogram or geom_bar use counts on y axis)
+ggplot(data = P_month, mapping = aes(mnth_total))+
+  geom_histogram(binwidth = 50, col = "white", fill = "blue")+
+  labs(title = "Column Histogram for Precipitation", 
+       x = "Overall Total Precipitation per month (mm)", y ="Frequency")
+#
+# line histogram of monthly totals 
+ggplot(P_month, aes(mnth_total))+
+  geom_freqpoly(binwidth = 50)+
+  labs(title = "Column Histogram for Precipitation", 
+       x = "Overall Total Precipitation per month (mm)", y ="Frequency")
+#
+ggplot(aes(x = MNTH, y = mnth_total), data = P_month) + 
+  geom_col() + labs(x = "Month", y = "Total Monthly Precipitation (mm)",
+                    title = "Bar chart of Monthly Totals") +
+  scale_x_discrete(limits = month.abb) 
+                                    
+
+# multiple plots shown in one with facet
+# 15 total plots, one per gauge showing overall (34 yr) monthly totals
+ggplot(data = P_month, mapping = aes(x = MNTH, y = mnth_total))+
+    geom_point()+ facet_wrap(~GaugeID, nrow = 3) # each gauge is plotted
+
+# annual P
+ggplot(data = P_annual, mapping = aes(x = YR, y = yr_total))+
+  geom_point()+ facet_wrap(~GaugeID, nrow = 5) 
+
+filter(prcp2, MNTH == "10") %>%  #GaugeID == "06814000"
+  ggplot(aes(x = YR, y = total_mnth, color = GaugeID)) + geom_line() 
+
+gauge = data.frame(lat = c(39.94778, 39.23833, 38.56701, 38.71069, 37.12891, 
+                           38.19645, 33.55455, 30.0641, 29.97938, 28.29195, 
+                           33.82227, 33.73644, 33.84311, 33.82783, 36.21468),
+                   long = c(-96.10862, -95.8886, -95.96163, -95.83603, -97.60144, 
+                            -96.82458, -96.94723, -99.38699, -97.91, -97.27916, 
+                            -109.81454, -110.16677, -110.55761, -110.85623, -120.47071),
+                   gaugeID = c("6814000", "6889200", "6910800", "6911900", "7151500",
+                               "7180500", "8050800", "8165300", "8171300", "8189500",
+                               "9492400", "9494000", "9497800", "9497980", "11224500"),
+                   stringsAsFactors = FALSE)
