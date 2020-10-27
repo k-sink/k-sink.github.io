@@ -1,0 +1,110 @@
+# Assignment 7 EPPS 6356
+# Build a shiny app using the following datasets (dataset library)
+# mtcars, USArrests, uspop
+
+# credit to https://github.com/cmjd1993/DDP_Project3/commit/e145e75caa6cb88a3b1ca3c1f31be1668423a15c
+
+# server.R file 
+# function with instructions on how to build and rebuild 
+# R objects displayed in user interface
+
+# load libraries
+library(shiny) # shiny app combines ui and server into functioning app
+library(mapproj)
+library(maps)
+library(ggplot2)
+library(datasets)
+library(plotly)
+
+# Create dataframe in R
+# load USArrests data from dataset package into data frame
+# create additional column of state names from rows in original dataset
+crimes = data.frame(state = tolower(rownames(USArrests)),USArrests)
+
+
+# create function called "myplot" which will create the plot that will  
+# change for each different crime type 
+
+myplot =  function(type, pal){    # pal is palette parameter
+  # function can accept numeric vectors and return colors
+  
+# get a US states map from the map package
+  states_map = map_data("state")
+  
+  # will return the correct rate
+  Arrests = type[,2]
+  
+# create a map of the states using ggplot2 called "g" 
+# colors will be based on a gradient with low near white and high near pure color
+  
+  g = ggplot(type, aes(map_id = state)) +
+    geom_map(map = states_map, aes(fill = Arrests)) +
+    scale_fill_gradient2(low = "floralwhite", high = pal) +
+    expand_limits(x = states_map$long, y = states_map$lat) +
+    coord_map("mercator") +
+    theme(
+      axis.title=element_blank(),
+      panel.background = element_rect(fill = "white"),
+      legend.position = "bottom")
+  
+  # use ggplotly to transform ggplot into a plotly plot
+  ggplotly(g)
+  
+}
+
+# define server logic to plot selected variable on map
+server = function(input, output) {
+  
+  # render plotly plot using renderPlotly()
+  output$plot <- renderPlotly({
+    
+    # create "type" and "pal" that will create a reactive map with each crime type selected. 
+    # Use with switch() command to achieve this.
+    
+    
+    type <- switch(input$crime,
+                   "Murder" = crimes[,c("state", "Murder")],
+                   "Assault" = crimes[,c("state", "Assault")],
+                   "Rape" = crimes[,c("state", "Rape")])
+    
+    
+    pal <- switch(input$crime,
+                  "Murder" = "firebrick4",
+                  "Assault" = "violetred4",
+                  "Rape" = "deepskyblue4")
+    
+    # run map function
+    myplot(type, pal)
+    
+  }) 
+  
+}
+
+# Define UI (user interface) for the web app
+# nested R functions that assemble and HTML user interface for the app
+ui = fluidPage(
+  
+  # App title
+  titlePanel("Arrests for Violent Crimes by U.S. State (1973)"),
+  
+  
+  fluidRow(
+    # add help text to add context to map
+    helpText("The data used in this application is from the USArrests dataset, 
+    available in the R datasets system library.
+             Select the type of violent crime to see the number of arrests (per 100,000 people). 
+             Hover the cursor over a state to see its individual rate."),
+    
+    # add a select input to split the data, selector for variable 
+    selectInput("crime", "Crime Type", choices = c("Murder","Assault", "Rape"), selected = "Murder")
+  ),
+  # ensure that the output is plotly or else it will return a non interactive plot
+  # main panel displays outputs
+  mainPanel(plotlyOutput("plot",  width = 800, height = 600)
+  )
+
+)
+
+# Create Shiny app ----
+shinyApp(ui, server)
+
